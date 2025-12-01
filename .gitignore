@@ -39,3 +39,12 @@
 
 # debug information files
 *.dwo
+
+# LaTeX
+*.out
+*.toc
+*.log
+*.fls
+*.aux
+*.fdb_latexmk
+*.gz

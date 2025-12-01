@@ -23,21 +23,17 @@ SERVER_SOURCES = $(SRCDIR)/main_server.cpp $(SRCDIR)/server.cpp $(SRCDIR)/databa
 CLIENT_SOURCES = $(SRCDIR)/main_client.cpp $(SRCDIR)/client.cpp
 INIT_SOURCES = $(SRCDIR)/init_database.cpp $(SRCDIR)/database.cpp $(SRCDIR)/account.cpp $(SRCDIR)/crypto.cpp
 VIEW_SOURCES = $(SRCDIR)/view_database.cpp $(SRCDIR)/database.cpp $(SRCDIR)/account.cpp $(SRCDIR)/crypto.cpp
-# УДАЛИТЬ эту строку: VIEW_ENCRYPTED_SOURCES = $(SRCDIR)/view_encrypted_db.cpp $(SRCDIR)/database.cpp $(SRCDIR)/account.cpp $(SRCDIR)/crypto.cpp
 
 SERVER_OBJECTS = $(SERVER_SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 CLIENT_OBJECTS = $(CLIENT_SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 INIT_OBJECTS = $(INIT_SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 VIEW_OBJECTS = $(VIEW_SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
-# УДАЛИТЬ эту строку: VIEW_ENCRYPTED_OBJECTS = $(VIEW_ENCRYPTED_SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 
 SERVER_TARGET = $(BINDIR)/bank_server
 CLIENT_TARGET = $(BINDIR)/bank_client
 INIT_TARGET = $(BINDIR)/init_db
 VIEW_TARGET = $(BINDIR)/view_db
-# УДАЛИТЬ эту строку: VIEW_ENCRYPTED_TARGET = $(BINDIR)/view_encrypted_db
 
-# УДАЛИТЬ view_encrypted_db из списка целей
 all: $(SERVER_TARGET) $(CLIENT_TARGET) $(INIT_TARGET) $(VIEW_TARGET)
 
 $(SERVER_TARGET): $(SERVER_OBJECTS) | $(BINDIR)
@@ -51,9 +47,6 @@ $(INIT_TARGET): $(INIT_OBJECTS) | $(BINDIR)
 
 $(VIEW_TARGET): $(VIEW_OBJECTS) | $(BINDIR)
 	$(CXX) $(VIEW_OBJECTS) -o $@ $(LDFLAGS)
-
-# УДАЛИТЬ это правило: $(VIEW_ENCRYPTED_TARGET): $(VIEW_ENCRYPTED_OBJECTS) | $(BINDIR)
-#	$(CXX) $(VIEW_ENCRYPTED_OBJECTS) -o $@ $(LDFLAGS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -74,10 +67,7 @@ init: $(INIT_TARGET)
 
 view: $(VIEW_TARGET)
 
-# УДАЛИТЬ эту цель: view_encrypted: $(VIEW_ENCRYPTED_TARGET)
-
 # Цель для быстрой перекомпиляции всех утилит просмотра
-# ИЗМЕНИТЬ эту цель: view_all: $(VIEW_TARGET) $(VIEW_ENCRYPTED_TARGET)
 view_all: $(VIEW_TARGET)
 
 # Цель для запуска тестовой базы данных
@@ -92,6 +82,14 @@ run_server: setup server
 run_client: client
 	./$(CLIENT_TARGET)
 
+# Цель для просмотр данных accounts.dat
+view_data: $(VIEW_TARGET)
+	./$(VIEW_TARGET) data/accounts.dat
+
+# Цель для просмотра очереди верификации
+# view_verification: $(VIEW_TARGET)
+# 	./$(VIEW_TARGET) data/verification_queue.dat
+
 clean:
 	rm -rf $(OBJDIR) $(BINDIR)
 
@@ -102,5 +100,4 @@ clean_data:
 # Полная очистка (данные + скомпилированные программы)
 distclean: clean clean_data
 
-# УДАЛИТЬ view_encrypted из списка .PHONY
 .PHONY: all server client init view view_all setup run_server run_client clean clean_data distclean

@@ -1,0 +1,611 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{float}
+
+\geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstset{inputencoding=utf8x, extendedchars=\true}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\usepackage{dirtree}
+\usepackage{forest}
+
+\title{Документация к проекту\\ Secure Bank System}
+\author{Бойко Руслан и Осипов Илья}
+\date{\today}
+
+\graphicspath{ {./pic/} } 
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Документация описывает архитектуру, функциональные и нефункциональные требования, а также краткое пользовательское руководство для Secure Bank System -- многопользовательской банковской системы с системой безопасности, верификации и шифрования операций.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Функциональные требования}
+
+\subsection{Управление клиентами}
+Система обеспечивает полный цикл управления клиентскими учетными записями:
+\begin{itemize}
+\item Регистрация новых клиентов с обязательной проверкой паспортных данных на уникальность;
+\item Аутентификация пользователей по уникальному идентификатору учетной записи и паролю;
+\item Процедура верификации клиентов уполномоченными сотрудниками службы безопасности
+\end{itemize}
+
+\subsection{Управление банковскими счетами}
+Реализована система управления счетами различных категорий:
+\begin{itemize}
+\item Создание и ведение счетов следующих типов:
+  \begin{itemize}
+  \item Сберегательные счета (Savings)
+  \item Расчётные счета (Checking) 
+  \item Кредитные счета (Credit)
+  \item Депозитные счета (Deposit)
+  \end{itemize}
+\item Предоставление информации о текущем балансе и полной истории транзакций по каждому счёту
+\item Установка и управление кредитными лимитами для счетов кредитного типа
+\end{itemize}
+
+\subsection{Банковские операции}
+Система поддерживает проведение стандартных банковских операций:
+\begin{itemize}
+\item Операции пополнения счетов (deposit)
+\item Операции снятия денежных средств (withdraw) с автоматической проверкой доступных лимитов
+\item Переводы денежных средств между счетами (transfer) в рамках клиентов системы;
+\item Механизм одобрения/отклонения крупных операций службой безопасности банка.
+\end{itemize}
+
+\subsection{Система безопасности}
+Реализованы многоуровневые механизмы защиты:
+\begin{itemize}
+\item Шифрование всех данных, хранимых в базе данных системы;
+\item Двухуровневая система аутентификации (клиенты банка / сотрудники банка);
+\item Система очередей для одобрения операций, превышающих установленные лимиты;
+\item Специальные ограничения для новых и неверифицированных пользователей.
+\end{itemize}
+
+\subsection{Административные функции}
+Для сотрудников банка предусмотрены административные функции:
+\begin{itemize}
+\item Просмотр и обработка операций, ожидающих одобрения;
+\item Верификация новых клиентов банка;
+\item Управление процентными ставками по кредитным и депозитным продуктам (в процессе реализации);
+\end{itemize}
+
+\section{Системные требования}
+
+\subsection{Требования к производительности}
+\begin{itemize}
+\item Время отклика системы не должно превышать 100 мс для стандартных банковских операций зачисления, перевода и снятия;
+\item Система должна поддерживать несколько одновременных клиентских подключений (и параллельную обработку запросов);
+\item Эффективное использование оперативной памяти и ресурсов процессора.
+\end{itemize}
+
+\subsection{Требования к безопасности}
+\begin{itemize}
+\item Обязательное шифрование всех конфиденциальных данных при хранении
+\item Применение алгоритмов хеширования для хранения паролей пользователей
+\item Комплексная валидация всех входных данных и параметров операций
+\item Реализация механизма управления сессиями с автоматическим завершением по таймауту
+\end{itemize}
+
+\subsection{Требования к надёжности}
+\begin{itemize}
+\item Автоматическое сохранение состояния системы при каждом изменении данных;
+\item Возможность восстановления работоспособности после аварийных сбоев;
+\item Регулярное резервное копирование базы данных с возможностью восстановления.
+\end{itemize}
+
+\subsection{Требования к масштабируемости}
+\begin{itemize}
+\item Модульная архитектура системы, позволяющая добавлять новые функциональные компоненты
+\item Четкое разделение клиентской и серверной частей системы
+\item Поддержка многопоточности для обработки параллельных запросов
+\end{itemize}
+
+\subsection{Требования к совместимости}
+\begin{itemize}
+\item Кроссплатформенная работа на операционных системах семейства macOS (Linux и Windows в процессе отладки);
+\item Использование стандартных сетевых протоколов TCP/IP для клиент-серверного взаимодействия;
+\item Независимость от внешних систем управления базами данных.
+\end{itemize}
+
+\subsection{Технические требования}
+Тестирование программы производилось на следующем сетапе:
+\begin{itemize}
+\item Язык программирования: C++17 или выше
+\item Компилятор: GCC 9.0+, Clang 10.0+, CMake 4.2+ или MSVC 2019+
+\item Минимальный объем оперативной памяти: 8 ГБ 
+\item Минимальное дисковое пространство: 128 ГБ для установки и работы
+\item Сетевой интерфейс для клиент-серверного взаимодействия
+\end{itemize}
+
+
+
+
+
+\newpage
+\section{Архитектурная документация}
+
+Secure Bank System реализована по многоуровневой клиент-серверной архитектуре с четким разделением ответственности между компонентами. Архитектура следует принципам модульности и инкапсуляции, что обеспечивает высокую сопровождаемость и масштабируемость системы.
+
+Ключевые архитектурные решения:
+\begin{itemize}
+    \item Трехуровневая архитектура: клиентский уровень, серверный уровень, уровень данных;
+    \item Событийно-ориентированная обработка: асинхронная обработка клиентских подключений;
+    \item Многопоточность: изолированные потоки для каждого клиентского соединения;
+    \item Пассивный объект базы данных: инкапсуляция логики хранения и сериализации.
+\end{itemize}
+
+Дерево проекта: 
+\dirtree{%
+.1 .
+.2 CMakeLists.txt.
+.2 Makefile.
+% .2 build.
+% .3 Makefile.
+% .3 data.
+% .3 test\_data.
+.2 data.
+.3 accounts.dat.
+.3 accounts.dat.settings.
+.3 verification\_queue.dat.
+.2 src.
+.3 account.cpp.
+.3 account.h.
+.3 client.cpp.
+.3 client.h.
+.3 crypto.cpp.
+.3 crypto.h.
+.3 database.cpp.
+.3 database.h.
+.3 init\_database.cpp.
+.3 main\_client.cpp.
+.3 main\_server.cpp.
+.3 server.cpp.
+.3 server.h.
+.3 view\_database.cpp.
+.2 tests.
+.3 test\_bank\_system.cpp.
+}
+\begin{comment}
+.
+├── CMakeLists.txt
+├── Makefile
+├── build
+│   ├── CMakeCache.txt
+│   ├── CMakeFiles
+│   ├── CTestTestfile.cmake
+│   ├── DartConfiguration.tcl
+│   ├── Makefile
+│   ├── Testing
+│   ├── cmake_install.cmake
+│   ├── data
+│   └── test_data
+├── data
+│   ├── accounts.dat
+│   ├── accounts.dat.settings
+│   └── verification_queue.dat
+├── src
+│   ├── account.cpp
+│   ├── account.h
+│   ├── client.cpp
+│   ├── client.h
+│   ├── crypto.cpp
+│   ├── crypto.h
+│   ├── database.cpp
+│   ├── database.h
+│   ├── init_database.cpp
+│   ├── main_client.cpp
+│   ├── main_server.cpp
+│   ├── server.cpp
+│   ├── server.h
+│   └── view_database.cpp
+├── tests
+    └── test_bank_system.cpp
+\end{comment}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.99\textwidth]{class-diagram.png}
+\caption{Диаграмма классов системы}
+\label{fig:class}
+\end{figure}
+
+\subsection{Компонентная архитектура}
+
+Программный код можно разделить на следующие ключевые компоненты:
+\begin{itemize}
+\item \textbf{Client Application} -- клиентское приложение;
+\item \textbf{Bank Server} -- многопоточный сервер с системой сессий;
+\item \textbf{Database Layer} -- слой работы с данными;
+\item \textbf{Security Module} -- модуль безопасности и шифрования.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{architecture-diagram.png}
+\caption{Архитектурная диаграмма системы}
+\label{fig:architecture}
+\end{figure}
+
+
+\subsection{Логика обработки запросов}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{dataflow-diagram.png}
+\caption{Логика обработки клиентских запросов}
+\label{fig:dataflow}
+\end{figure}
+
+\subsection{Архитектурная диаграмма компонент}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{component-diagram.png}
+\caption{Диаграмма компонент системы}
+\label{fig:component}
+\end{figure}
+
+\subsection{Диаграмма последовательности операций}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{sequence-diagram.png}
+\caption{Последовательность выполнения операции перевода средств}
+\label{fig:sequence}
+\end{figure}
+
+
+\newpage
+\section{Пользовательская документация}
+
+\subsection*{Инициализация системы}
+\begin{lstlisting}[language=bash]
+# Компиляция и настройка
+make setup
+# Запуск сервера
+make run_server
+# Запуск клиента (в другом терминале)
+make run_client
+\end{lstlisting}
+
+\subsection*{Тестовые учетные записи}
+\begin{tcolorbox}
+\begin{verbatim}
+Обычный клиент:         ACC1001 / password123
+Обычный клиент:         ACC1002 / qwerty456  
+Неверифицированный:     ACC1003 / test789
+Сотрудник безопасности: SUPER001 / superpass123
+\end{verbatim}
+\end{tcolorbox}
+
+\subsection{Основные команды}
+
+\subsubsection{Команды без авторизации:}
+\begin{lstlisting}
+RATES                                          # Просмотр ставок
+REGISTER ФИО 1990-05-15 4510123456 password123 # Регистрация нового пользователя
+LOGIN ACC1001 password123                      # Войти в аккаунт
+SUPERLOGIN SUPER001 superpass123               # Войти в акккаунт банковского сотрудника
+HELP                                           # Справка
+\end{lstlisting}
+
+\subsubsection{Команды после авторизации клиента:}
+\begin{lstlisting}
+ACCOUNTS                # Список счетов
+DEPOSIT 1000            # Пополнение на первый счёт 1000 тугриков
+WITHDRAW 500            # Снятие с первого счёта 500 тугриков
+TRANSFER ACC1002 200    # Перевод пользователю ACC1002 200 тугриков
+HISTORY 0               # История операций
+CREATE_ACCOUNT 0        # 0=Savings, 1=Checking, 2=Credit, 3=Deposit
+INFO                    # Информация о клиенте
+LOGOUT                  # Выход из аккаунта
+\end{lstlisting}
+
+\subsubsection{Команды сотрудника безопасности:}
+\begin{lstlisting}
+PENDING_REQUESTS       # Ожидающие операции
+PENDING_VERIFICATIONS  # Ожидающие верификации
+APPROVE 0              # Одобрить запрос 0
+REJECT 1               # Отклонить запрос 1  
+VERIFY 0               # Верифицировать клиента 0
+SET_RATES 12.0 6.5     # Установить ставки
+SETTINGS               # Текущие настройки
+\end{lstlisting}
+
+\section{Пример пайплайна работы}
+
+\subsection{Стандартная операция (пополнение счета)}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{standard-operation.png}
+\caption{Пайплайн выполнения стандартной операции пополнения счета}
+\label{fig:standard_op}
+\end{figure}
+
+\subsection{Операция с одобрением (крупный перевод)}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{approval-operation.png}
+\caption{Пайплайн операции перевода, требующей одобрения безопасности}
+\label{fig:approval_op}
+\end{figure}
+
+\subsection{Процесс регистрации нового клиента}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{registration-process.png}
+\caption{Процесс регистрации и верификации нового клиента}
+\label{fig:registration}
+\end{figure}
+
+
+
+
+\newpage
+\section{Технические особенности}
+
+\subsection*{Шифрование данных}
+\begin{itemize}
+\item Алгоритм: XOR + Base64 (для демонстрации, но можно и более продвинутые)
+\item Ключ: bank-system-key-2024 (для проверки дешифровальщика)
+\item Область применения: файлы базы данных и настроек
+\end{itemize}
+
+\subsection*{Сетевое взаимодействие}
+\begin{itemize}
+\item Протокол: TCP/IP
+\item Порт по умолчанию: 8080 (но можно открывать на произвольном)
+\item Формат команд: текстовые строки
+\item Кодировка: UTF-8 (по умолчанию)
+\end{itemize}
+
+\subsection*{Управление памятью}
+\begin{itemize}
+\item Умные указатели: для автоматического управления памятью
+\item RAII и умные указатели: для корректного распределения ресурсов (сокеты, файлы)
+\item Контейнеры STL: для хранения данных
+\end{itemize}
+
+\subsection*{Обработка ошибок}
+\begin{itemize}
+\item Исключения: для корректной обработки ошибок
+\item Коды возврата: для прослеживания логики работы
+\item Логирование: в консоль сервера и системные файлы
+\end{itemize}
+
+
+
+
+\newpage
+\section{Пайплайн работы над проектом}
+
+\setlist[itemize]{label=--}
+
+\subsection*{Изучение теоретической базы}
+\begin{itemize}
+    \item Принципы клиент-серверной архитектуры
+    \item Сетевые протоколы TCP/IP, сокеты в C++
+    \item Многопоточное программирование
+    \item Основы криптографии (хеширование, шифрование XOR + Base64)
+    \item Паттерны проектирования для банковских систем
+    \item Системы аутентификации и авторизации
+    \item Принципы безопасного хранения данных
+\end{itemize}
+
+\subsection*{Поэтапная разработка системы}
+
+\subsubsection*{Фаза 1: Базовая архитектура (Недели 1-2)}
+\textbf{Создание ``костяка'' системы:}
+\begin{itemize}
+    \item Разработана базовая структура проекта с разделением на модули
+    \item Реализованы классы Account, Transaction для представления банковских сущностей
+    \item Создана заготовка для системы клиент-серверного взаимодействия
+\end{itemize}
+\textbf{Основные решения:}
+\begin{itemize}
+    \item Выбрана трехуровневая архитектура (клиент-сервер-база данных)
+    \item Определены основные типы счетов: SAVINGS, CHECKING, CREDIT, DEPOSIT
+    \item Разработана структура транзакций с историей операций
+\end{itemize}
+
+\subsubsection*{Фаза 2: Сетевое взаимодействие (Недели 3-4)}
+\textbf{Реализация клиент-серверной связи:}
+\begin{itemize}
+    \item Разработан класс BankServer с многопоточным подключением клиентов
+    \item Создан класс BankClient для взаимодействия с сервером
+    \item Реализован текстовый протокол для команд (в терминале)
+\end{itemize}
+\textbf{Особенности реализации:}
+\begin{itemize}
+    \item Многопоточная обработка клиентов через std::thread
+    \item Система сессий для управления состоянием клиентов
+\end{itemize}
+
+\subsubsection*{Фаза 3: Работа с данными и система аутентификации (Недели 5-7)}
+\textbf{Реализация системы хранения:}
+\begin{itemize}
+    \item Класс Database для управления данными
+    \item Шифрование записей в базе данных (создан модуль Crypto для шифрования и хеширования)
+    \item Реализована система регистрации и логина
+    \item Добавлена двухуровневая аутентификация (клиенты/суперпользователи)
+\end{itemize}
+\textbf{Особенности реализации:}
+\begin{itemize}
+    \item Автоматическое сохранение при изменениях
+    \item Резервное копирование и восстановление
+    \item Формат хранения с поддержкой сохранения истории транзакций
+\end{itemize}
+\textbf{Реализовано:}
+\begin{itemize}
+    \item REGISTER -- регистрация новых пользователей
+    \item LOGIN -- вход для обычных клиентов
+    \item SUPERLOGIN -- вход для сотрудников безопасности
+    \item Реализована утилита view\_database для просмотра зашифрованных данных
+    \item Создан скрипт инициализации тестовых данных init\_database
+    \item Добавлено логирование ключевых событий на сервере
+\end{itemize}
+
+\subsubsection*{Фаза 4: Базовые банковские операции (Неделя 8)}
+\textbf{Реализация основных функций:}
+\begin{itemize}
+    \item DEPOSIT / DEPOSIT\_TO -- пополнение счетов
+    \item WITHDRAW / WITHDRAW\_FROM -- снятие средств
+    \item TRANSFER / TRANSFER\_FROM -- переводы между счетами
+    \item CREATE\_ACCOUNT -- создание новых счетов
+\end{itemize}
+\textbf{Особенности реализации:}
+\begin{itemize}
+    \item Автоматическое ведение истории транзакций
+    \item Поддержка кредитных лимитов для счетов
+\end{itemize}
+
+\subsubsection*{Фаза 5: Система одобрения операций (Недели 9-10)}
+\textbf{Реализация безопасности для крупных операций:}
+\begin{itemize}
+    \item Механизм очередей запросов на одобрение
+    \item Команды для суперпользователей: APPROVE, REJECT, PENDING\_REQUESTS
+    \item Автоматическое определение крупных операций по пороговому значению
+\end{itemize}
+\textbf{Особенности реализации:}
+\begin{itemize}
+    \item Операции выше порога требуют одобрения безопасности
+    \item Система ожидания ответа с таймаутом
+    \item Уведомления клиентов о статусе операций
+\end{itemize}
+
+\subsubsection*{Фаза 6: Верификация пользователей (Недели 9-10)}
+\textbf{Система проверки клиентов:}
+\begin{itemize}
+    \item Статусы пользователей: PENDING\_VERIFICATION, VERIFIED, BLOCKED (в процессе)
+    \item Очередь запросов на верификацию
+    \item Команды VERIFY, PENDING\_VERIFICATIONS для суперпользователей
+\end{itemize}
+\textbf{Для неверефицированных пользователей установлены:}
+\begin{itemize}
+    \item Лимиты на размер операций
+    \item Запрет на создание кредитных и депозитных счетов
+\end{itemize}
+\emph{Для верифицированных пользователей остаётся доступен весь ранее описанный функционал.}
+
+\subsubsection*{Фаза 7: Процентные ставки и настройки (Неделя 11, не закончено)}
+\textbf{Управление банковскими параметрами:}
+\begin{itemize}
+    \item Система хранения настроек банка (лимиты, ставки)
+    \item Команды SET\_RATES, SETTINGS для управления ставками
+    \item Динамическое применение изменений
+\end{itemize}
+
+\subsubsection*{Фаза 8: Тестирование системы (Недели 12-13)}
+
+\subsubsection*{Модульное тестирование}
+\begin{itemize}
+    \item Создан комплексный тестовый класс BankSystemTest
+    \item Тестирование основных сценариев: регистрация, логин, операции
+    \item Проверка обработки ошибок и граничных случаев
+\end{itemize}
+
+\subsubsection*{Интеграционное тестирование}
+\begin{itemize}
+    \item Тестирование взаимодействия клиент-сервер
+    \item Проверка работы системы одобрения операций
+    \item Тестирование восстановления после сбоев
+\end{itemize}
+
+\subsubsection*{Нагрузочное тестирование}
+\begin{itemize}
+    \item Проверка многопользовательской работы
+    \item Тестирование обработки параллельных запросов
+\end{itemize}
+
+\subsubsection*{Инструменты тестирования}
+\begin{itemize}
+    \item Google Test framework для unit-тестов
+    \item Автоматизированные сценарии для интеграционного тестирования
+    \item Ручное тестирование пользовательских сценариев
+\end{itemize}
+
+\subsubsection*{Документирование}
+\begin{itemize}
+    \item Создана документация на русском языке
+    \item Описаны функциональные и системные требования
+    \item Разработаны архитектурные диаграммы и схемы работы
+    \item Создано пользовательское руководство с примерами
+\end{itemize}
+
+\subsubsection*{Оптимизация и рефакторинг}
+\begin{itemize}
+    \item Улучшена обработка ошибок
+    \item Оптимизирована работа с памятью
+    \item Улучшена производительность сетевого взаимодействия
+\end{itemize}
+
+\subsection*{Итог работы}
+Проект развивался по принципу ``снизу вверх'' -- от базовых структур данных к сложной логике взаимодействия клиента, сервера и суперпользователя. Каждый этап включал проектирование, реализацию, а также обязательное тестирование и интеграцию (что облегчалось, так как старались придерживаться модульности приложения по SOLID). Такой подход позволил создать стабильную, безопасную и \underline{расширяемую} банковскую систему.
+
+
+
+
+
+
+\newpage
+\section{Заключение}
+
+Secure Bank System представляет собой комплексное решение для безопасного банковского обслуживания с модульной архитектурой и многоуровневой системой безопасности. Система демонстрирует лучшие практики разработки финансовых приложений и может служить основой для более сложных банковских систем.
+
+\begin{thebibliography}{9}
+\bibitem{cpp17} ISO/IEC 14882:2017 - Programming Language C++
+\bibitem{securecoding} Seacord, R. C. (2013). \emph{Secure Coding in C and C++}
+\bibitem{networkprogramming} Donahoo, M. J., \& Calvert, K. L. (2001). \emph{TCP/IP Sockets in C: Practical Guide for Programmers}
+\bibitem{yandex_raii_2023}
+RAII и умные указатели // Справочник по C++ Яндекс [Электронный ресурс]. URL: https://education.yandex.ru/handbook/cpp/article/raii-and-smart-pointers.
+\bibitem{deepwiki_base64_xor}
+StivenHacker. Base64 and XOR Encryption // DeepWiki [Электронный ресурс]. URL: https://deepwiki.com/stivenhacker/GhostStrike/3.1-base64-and-xor-encryption.
+\end{thebibliography}
+
+\end{document}
+
