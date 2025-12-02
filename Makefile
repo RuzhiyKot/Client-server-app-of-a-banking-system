@@ -75,7 +75,7 @@ setup: $(INIT_TARGET)
 	./$(INIT_TARGET)
 
 # Цель для запуска сервера с тестовой базой
-run_server: setup server
+run_server: server
 	./$(SERVER_TARGET)
 
 # Цель для запуска клиента
@@ -85,6 +85,10 @@ run_client: client
 # Цель для просмотр данных accounts.dat
 view_data: $(VIEW_TARGET)
 	./$(VIEW_TARGET) data/accounts.dat
+
+# Очистка и удаление директории build
+clean_build:
+	rm -rf build/
 
 # Цель для просмотра очереди верификации
 # view_verification: $(VIEW_TARGET)
@@ -98,6 +102,6 @@ clean_data:
 	rm -rf data
 
 # Полная очистка (данные + скомпилированные программы)
-distclean: clean clean_data
+distclean: clean clean_data clean_build
 
 .PHONY: all server client init view view_all setup run_server run_client clean clean_data distclean

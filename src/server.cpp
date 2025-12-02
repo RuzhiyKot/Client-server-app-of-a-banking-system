@@ -297,8 +297,8 @@ void BankServer::processCommand(int clientSocket, ClientSession& session, const 
                        "DEPOSIT_TO <account_index> <amount> [description] - deposit to specific account\n"
                        "WITHDRAW <amount> [description] - withdraw from first account\n"
                        "WITHDRAW_FROM <account_index> <amount> [description] - withdraw from specific account\n"
-                       "TRANSFER <target_account> <amount> [description] - transfer from first account\n"
-                       "TRANSFER_FROM <account_index> <target_account> <amount> [description]\n"
+                       "TRANSFER <target_accountID> <amount> [description] - transfer from first account\n"
+                       "TRANSFER_FROM <account_index> <target_accountID> <amount> [description]\n"
                        "HISTORY [account_index] - show transaction history\n"
                        "CREATE_ACCOUNT <type> - create new account (0=Savings, 1=Checking, 2=Credit, 3=Deposit)\n"
                        "INFO - show client information\n";
@@ -318,7 +318,7 @@ void BankServer::processCommand(int clientSocket, ClientSession& session, const 
         }
         
         helpText += "HELP - show this help\n"
-                   "EXIT - quit the application";
+                    "EXIT - quit the application";
         
         sendResponse(clientSocket, helpText);
         return;
@@ -882,7 +882,7 @@ void BankServer::handleWithdrawFromAccount(int clientSocket, ClientSession& sess
 
 void BankServer::handleTransfer(int clientSocket, ClientSession& session, const std::vector<std::string>& args) {
     if (args.size() < 2) {
-        sendResponse(clientSocket, "ERROR: Usage: TRANSFER <target_account> <amount> [description]");
+        sendResponse(clientSocket, "ERROR: Usage: TRANSFER <target_accountID> <amount> [description]");
         return;
     }
     
@@ -937,7 +937,7 @@ void BankServer::handleTransfer(int clientSocket, ClientSession& session, const 
 
 void BankServer::handleTransferFromAccount(int clientSocket, ClientSession& session, const std::vector<std::string>& args) {
     if (args.size() < 3) {
-        sendResponse(clientSocket, "ERROR: Usage: TRANSFER_FROM <account_index> <target_account> <amount> [description]");
+        sendResponse(clientSocket, "ERROR: Usage: TRANSFER_FROM <account_index> <target_accountID> <amount> [description]");
         return;
     }
     
